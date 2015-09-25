@@ -4,10 +4,15 @@ $(document).ready(function(){
 		/*This function should create a post request using jquery. When posted it should:
 			1) Add tweets to the 'database'
 			2) After posted prepend message to list of messages and clear input box */
+		$.post(message.txt ,data,callback);
+	
+	
 	}
 
 	function getData() {
 		/*This function should make a get request from 'database', parse the data and prepend each to the page*/
+		$.get(URL,callback);
+		
 	}
 
 	/*Calls function once page loaded to display tweets to page*/
