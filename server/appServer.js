@@ -1,20 +1,20 @@
 var fs = require('fs');
 var path = require('path');
 var url = require('url');
-var http = require('http');
+//var http = require('http');
 
 function getFileExtension(route) {
     var arr = route.split('.');
-    if(arr.length<=1) {
+    if (arr.length <= 1) {
         return 'html'
     }
-    return arr[arr.length -1].toLowerCase();
+    return arr[arr.length - 1].toLowerCase();
 }
 
 function handleRequests(req, res) {
     var header;
     var route = url.parse(req.url).path;
-    if(route === '/') {
+    if (route === '/') {
         route = '/index.html';
     }
     var ext = getFileExtension(route);
@@ -40,14 +40,14 @@ function handleRequests(req, res) {
             };
             break;
     }
-    
+
     var filePath;
-    if(route === '/messages') {
-        if(req.method === 'GET') {
+    if (route === '/messages') {
+        if (req.method === 'GET') {
             filePath = './messages.txt';
             readFile(filePath, header, res);
         }
-        if(req.method === 'POST') {
+        if (req.method === 'POST') {
             var body = '';
             req.on('data', function (data) {
                 body += data;
@@ -63,13 +63,14 @@ function handleRequests(req, res) {
 }
 
 function writeTweet(tweet, res) {
-    if(tweet.text && tweet.userName) {
+    if (tweet.text && tweet.userName) {
         console.log(tweet);
-        fs.appendFile(__dirname + '/messages.txt', JSON.stringify(tweet), function(err){
-            console.log(err);
-            res.writeHead(200);
-            res.end();
-        });
+        fs.appendFile(__dirname + '/messages.txt', '\n' + JSON.stringify(tweet),
+            function (err) {
+                console.log(err);
+                res.writeHead(201);
+                res.end();
+            });
     } else {
         console.log('server error');
         res.writeHead(500);
@@ -78,13 +79,18 @@ function writeTweet(tweet, res) {
 }
 
 function readFile(filePath, header, res) {
-    
+
     var file = path.join(__dirname, filePath);
-      fs.readFile(file, function (err, data) {
+    fs.readFile(file, function (err, data) {
+        if(err){
+            var statusCode = statusCode || 404;
+            res.writeHead(statusCode, header);
+            res.end(data);
+        }
         var statusCode = statusCode || 200;
         res.writeHead(statusCode, header);
         res.end(data);
-      });
+    });
 }
 
 module.exports = {
